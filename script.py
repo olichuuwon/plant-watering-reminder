@@ -1,56 +1,57 @@
 """
-To be completed when free
-To implement weather api to get weather condiitons
-To implement task scheduler or add in startup
+api key have set a limit of 50 requests per day
+api key to be kept in a safe place (env/removed)
 """
 
 import requests
-import json
+
 import os
 from datetime import datetime, timedelta
+import ctypes
 
-# Replace with your OpenWeatherMap API key and city details
-API_KEY = 'your_openweathermap_api_key'
-CITY = 'your_city'
-COUNTRY = 'your_country_code'
+API_KEY = ""
+LAT = 1.3667
+LON = 103.8
+NOW = datetime.now()
+TWO_DAYS_AGO = NOW - timedelta(days=2)
+DATE = TWO_DAYS_AGO.strftime("%Y-%m-%d")
 
-# File to store the last rain date
-FILE_PATH = os.path.expanduser('~\\last_rain_check.json')
+
+def show_alert(message):
+    ctypes.windll.user32.MessageBoxW(0, message, "Rain Detection for Plants", 1)
+
 
 def get_weather():
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={CITY},{COUNTRY}&appid={API_KEY}&units=metric'
+    url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={LAT}&lon={LON}&date={DATE}&appid={API_KEY}"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
     else:
+        print(f"Error: {response.status_code} - {response.text}")
         return None
 
-def has_rained_recently():
-    if os.path.exists(FILE_PATH):
-        with open(FILE_PATH, 'r') as file:
-            data = json.load(file)
-            last_rain_date = datetime.strptime(data['last_rain_date'], '%Y-%m-%d')
-            if datetime.now() - last_rain_date < timedelta(days=3):
-                return True
-    return False
 
-def update_last_rain_date():
-    with open(FILE_PATH, 'w') as file:
-        json.dump({'last_rain_date': datetime.now().strftime('%Y-%m-%d')}, file)
-
-def check_rain():
-    weather = get_weather()
-    if weather:
-        if 'rain' in weather['weather'][0]['main'].lower():
-            print("It has rained recently, no need to water the plants.")
-            update_last_rain_date()
-        else:
-            if has_rained_recently():
-                print("It hasn't rained for 3 days, but it rained recently.")
-            else:
-                print("It hasn't rained for 3 days! Remember to water your plants.")
+def rainfall_message(precipitation):
+    if precipitation <= 10:
+        message = """0 to 10 mm (0 to 0.4 inches) \n\nMinimal rainfall; likely need to water."""
+    elif 10 < precipitation <= 20:
+        message = """10 to 20 mm (0.4 to 0.8 inches) \n\nLight rain; check soil moisture. If dry, water your plants."""
+    elif 20 < precipitation <= 40:
+        message = """20 to 40 mm (0.8 to 1.6 inches) \n\nModerate rainfall; often sufficient moisture. Check the top inch of soil."""
     else:
-        print("Unable to fetch weather data.")
+        message = """More than 40 mm (1.6 inches) \n\nSignificant rainfall; usually no need to water unless the soil drains poorly."""
 
-if __name__ == '__main__':
-    check_rain()
+    return message
+
+
+def main():
+    weather_json = get_weather()
+    if weather_json is not None:
+        total_precipitation = weather_json["precipitation"]["total"]
+        show_alert(
+            f"{rainfall_message(total_precipitation)}\n\nTotal precipitation: {total_precipitation} mm"
+        )
+
+
+if __name__ == "__main__":
+    main()
