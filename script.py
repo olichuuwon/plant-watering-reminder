@@ -14,8 +14,8 @@ Click New and set Begin the task to At log on.
 
 Actions Tab:
 Click new and set Action to Start a program.
-In the Program/script field, add the path to your python.exe (e.g., C:\Python39\python.exe).
-In the Add arguments field, add the full path to your Python script (e.g., C:\path\to\script.py).
+In the Program/script field, add the path to your python.exe.
+In the Add arguments field, add the full path to your Python script.
 """
 
 # Standard Library Imports
@@ -89,5 +89,10 @@ def main():
         )
 
 
+def see_json():
+    print(get_weather())
+
+
 if __name__ == "__main__":
+    # see_json()
     main()
