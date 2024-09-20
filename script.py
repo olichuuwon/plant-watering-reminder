@@ -4,12 +4,16 @@ api key to be kept in a safe place (env/removed)
 """
 
 import requests
-
-import os
 from datetime import datetime, timedelta
 import ctypes
+import os
+from dotenv import load_dotenv
+import socket
+import time
 
-API_KEY = ""
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
 LAT = 1.3667
 LON = 103.8
 NOW = datetime.now()
@@ -40,16 +44,30 @@ def rainfall_message(precipitation):
         message = """20 to 40 mm (0.8 to 1.6 inches) \n\nModerate rainfall; often sufficient moisture. Check the top inch of soil."""
     else:
         message = """More than 40 mm (1.6 inches) \n\nSignificant rainfall; usually no need to water unless the soil drains poorly."""
-
     return message
 
 
+def is_connected():
+    try:
+        # Try to connect to a public DNS server
+        socket.create_connection(("8.8.8.8", 53))  # Google Public DNS
+        return True
+    except OSError:
+        return False
+
+
+def wait_for_internet():
+    while not is_connected():
+        time.sleep(5)  # Wait for 5 seconds before checking again
+
+
 def main():
+    wait_for_internet()
     weather_json = get_weather()
     if weather_json is not None:
         total_precipitation = weather_json["precipitation"]["total"]
         show_alert(
-            f"{rainfall_message(total_precipitation)}\n\nTotal precipitation: {total_precipitation} mm"
+            f"Total precipitation: {total_precipitation} mm\n\n{rainfall_message(total_precipitation)}"
         )
 
 
