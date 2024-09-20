@@ -3,13 +3,16 @@ api key have set a limit of 50 requests per day
 api key to be kept in a safe place (env/removed)
 """
 
-import requests
+# Standard Library Imports
+import os
+import time
+import socket
 from datetime import datetime, timedelta
 import ctypes
-import os
+
+# Third-Party Library Imports
+import requests
 from dotenv import load_dotenv
-import socket
-import time
 
 load_dotenv()
 
