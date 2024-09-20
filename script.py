@@ -1,6 +1,21 @@
 """
-api key have set a limit of 50 requests per day
-api key to be kept in a safe place (env/removed)
+Api key have set a limit of 50 requests per day
+Api key to be kept in a safe place (env/removed)
+
+Use Task Scheduler
+In the Actions pane, click Create Task.
+
+General Tab:
+Give your task a name (e.g., Run Python Script).
+Choose Configure for: Windows 10.
+
+Triggers Tab:
+Click New and set Begin the task to At log on.
+
+Actions Tab:
+Click new and set Action to Start a program.
+In the Program/script field, add the path to your python.exe (e.g., C:\Python39\python.exe).
+In the Add arguments field, add the full path to your Python script (e.g., C:\path\to\script.py).
 """
 
 # Standard Library Imports
