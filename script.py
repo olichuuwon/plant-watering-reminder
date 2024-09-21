@@ -40,7 +40,7 @@ DATE = TWO_DAYS_AGO.strftime("%Y-%m-%d")
 
 
 def show_alert(message):
-    ctypes.windll.user32.MessageBoxW(0, message, "Rain Detection for Plants", 1)
+    ctypes.windll.user32.MessageBoxW(0, message, "Plant Watering Reminder", 1)
 
 
 def get_weather():
